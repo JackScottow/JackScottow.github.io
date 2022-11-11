@@ -1,12 +1,11 @@
-var playerOneInput = document.querySelector("#playerOneInput");
-var playerTwoInput = document.querySelector("#playerTwoInput");
-var game = document.querySelector("#game");
-var startGame = document.querySelector("#start-game");
-var squares = document.querySelectorAll("#board div");
-var gameText = document.getElementById("game-text");
-var gameArr = new Array(9).fill(".");
-var startButton = document.querySelector("#start-button");
-var resetButton = document.querySelector("#reset");
+const playerOneInput = document.querySelector("#playerOneInput");
+const playerTwoInput = document.querySelector("#playerTwoInput");
+const game = document.querySelector("#game");
+const startGame = document.querySelector("#start-game");
+const squares = document.querySelectorAll("#board div");
+const gameText = document.querySelector("#game-text");
+const startButton = document.querySelector("#start-button");
+const resetButton = document.querySelector("#reset");
 const winArr = [
   [0, 1, 2],
   [3, 4, 5],
@@ -20,14 +19,43 @@ const winArr = [
 var win = false;
 var winner = "";
 
-const createPlayer = (name, symbol, turn) => {
-  return { name, symbol, turn };
+startButton.addEventListener("click", () => {
+  updatePlayer();
+});
+
+resetButton.addEventListener("click", () => {
+  reset();
+});
+
+squares.forEach((square) => {
+  square.addEventListener("click", () => {
+    let tileNum = parseInt(square.dataset.x);
+    if (!win) {
+      if (playerOne.turn && !playerOne.playLoc.includes(tileNum) && !playerTwo.playLoc.includes(tileNum)) {
+        square.classList.add(playerOne.symbol);
+        playerOne.playLoc.push(tileNum);
+        changeTurn();
+        updateText();
+        checkWin();
+      } else if (playerTwo.turn && !playerOne.playLoc.includes(tileNum) && !playerTwo.playLoc.includes(tileNum)) {
+        square.classList.add(playerTwo.symbol);
+        playerTwo.playLoc.push(tileNum);
+        changeTurn();
+        updateText();
+        checkWin();
+      }
+    }
+  });
+});
+
+const createPlayer = (name, symbol, turn, playLoc) => {
+  return { name, symbol, turn, playLoc };
 };
 
-const playerOne = createPlayer("X", "x", true);
-const playerTwo = createPlayer("O", "o", false);
+const playerOne = createPlayer("Player One", "X", true, []);
+const playerTwo = createPlayer("Player Twe", "O", false, []);
 
-const updateName = () => {
+const updatePlayer = () => {
   playerOne.name = playerOneInput.innerText;
   playerTwo.name = playerTwoInput.innerText;
   updateText();
@@ -36,17 +64,18 @@ const updateName = () => {
 };
 
 const changeTurn = () => {
-  playerOne.turn === true ? (playerOne.turn = false) : (playerOne.turn = true);
-  playerTwo.turn === true ? (playerTwo.turn = false) : (playerTwo.turn = true);
+  playerOne.turn = !playerOne.turn;
+  playerTwo.turn = !playerTwo.turn;
 };
 
 const updateText = () => {
   if (win) {
     gameText.innerHTML = `${winner} wins!`;
+    resetButton.innerText = "Play Again!";
   } else if (playerOne.turn) {
-    gameText.innerHTML = `${playerOne.name} (${playerOne.symbol.toUpperCase()})'s Turn`;
+    gameText.innerHTML = `${playerOne.name} (${playerOne.symbol})'s Turn`;
   } else if (playerTwo.turn) {
-    gameText.innerHTML = `${playerTwo.name} (${playerTwo.symbol.toUpperCase()})'s Turn`;
+    gameText.innerHTML = `${playerTwo.name} (${playerTwo.symbol})'s Turn`;
   }
 };
 
@@ -57,52 +86,26 @@ const reset = () => {
   });
   win = false;
   updateText();
-  gameArr.fill(".", 0);
+  playerOne.playLoc.length = 0;
+  playerTwo.playLoc.length = 0;
   startGame.style.display = "flex";
   game.style.display = "none";
+  resetButton.innerText = "Reset Game";
 };
 
 const checkWin = () => {
-  for (let i = 0; i < winArr.length; i++) {
-    if (gameArr[winArr[i][0]] != "." && gameArr[winArr[i][0]] === gameArr[winArr[i][1]] && gameArr[winArr[i][1]] === gameArr[winArr[i][2]]) {
-      winner = gameArr[winArr[i][0]];
+  winArr.forEach((subArr) => {
+    if (subArr.every((loc) => playerOne.playLoc.includes(loc))) {
+      winner = playerOne.name;
       win = true;
       updateText();
-    } else if (gameArr.indexOf(".") == -1 && win === false) {
+    } else if (subArr.every((loc) => playerTwo.playLoc.includes(loc))) {
+      winner = playerTwo.name;
+      win = true;
+      updateText();
+    } else if (playerOne.playLoc.length + playerOne.playLoc.length === 9) {
       gameText.innerText = "Draw!";
-    }
-  }
-};
-
-squares.forEach((square) => {
-  square.addEventListener("click", () => {
-    const tileNum = square.dataset.x;
-    if (!win) {
-      if (playerOne.turn === true) {
-        if (gameArr[tileNum] == ".") {
-          gameArr[tileNum] = playerOne.name;
-          square.classList.add(playerOne.symbol);
-          changeTurn();
-          updateText();
-          checkWin();
-        }
-      } else {
-        if (gameArr[tileNum] == ".") {
-          gameArr[tileNum] = playerTwo.name;
-          square.classList.add(playerTwo.symbol);
-          changeTurn();
-          updateText();
-          checkWin();
-        }
-      }
+      resetButton.innerText = "Play Again!";
     }
   });
-});
-
-startButton.addEventListener("click", () => {
-  updateName();
-});
-
-resetButton.addEventListener("click", () => {
-  reset();
-});
+};

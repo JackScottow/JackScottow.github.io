@@ -70,14 +70,14 @@ h1 {
   background-color: rgb(0, 85, 85);
 }
 
-.x {
+.X {
   background-image: url(./img/cross.svg);
   background-size: 85%;
   background-repeat: no-repeat;
   background-position: center;
 }
 
-.o {
+.O {
   background-image: url(./img/nought.svg);
   background-size: 85%;
   background-repeat: no-repeat;
