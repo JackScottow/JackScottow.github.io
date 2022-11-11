@@ -103,7 +103,7 @@ const checkWin = () => {
       winner = playerTwo.name;
       win = true;
       updateText();
-    } else if (playerOne.playLoc.length + playerOne.playLoc.length === 9) {
+    } else if (playerOne.playLoc.length + playerTwo.playLoc.length === 9) {
       gameText.innerText = "Draw!";
       resetButton.innerText = "Play Again!";
     }
